@@ -39,6 +39,36 @@ public class Lista {
             reha = null;
     }
 
+public boolean actualizar(Nodo nodoActual, Nota nuevosDatos) {
+    if (nodoActual == null) return false;
+    
+    Nodo temp = primero;
+    while (temp != null) {
+        if (temp == nodoActual) {
+            temp.dato = nuevosDatos;
+            return true;
+        }
+        temp = temp.sig;
+    }
+    return false;
+}
+
+public boolean actualizar(int posicion, Nota nuevosDatos) {
+    if (posicion < 0 || posicion >= longitud) return false;
+    
+    Nodo temp = primero;
+    int contador = 0;
+    while (temp != null) {
+        if (contador == posicion) {
+            temp.dato = nuevosDatos;
+            return true;
+        }
+        temp = temp.sig;
+        contador++;
+    }
+    return false;
+}
+
     public boolean deshacer() {
 
         if (desh == null) return false;
@@ -102,6 +132,7 @@ public class Lista {
 
     return true;
 }
+
 
 
 
