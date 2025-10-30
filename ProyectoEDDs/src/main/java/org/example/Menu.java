@@ -58,7 +58,6 @@ public class Menu {
                     String nuevoContenido = scanner.nextLine();
                     lista.actualizar(pos, new Nota(nuevoTitulo, nuevoContenido));
                     System.out.println("Actualizado.");
-                    System.out.println("Actualizado.");
                     break;
                 case 4:
                     // Llamada a lista.deshacer()
