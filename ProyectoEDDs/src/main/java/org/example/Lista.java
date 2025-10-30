@@ -90,16 +90,12 @@ public class Lista {
     Movimiento r = reha;
     reha = reha.sig;
     Nodo nodo = r.nodo;
-
-    // el nodo debería estar ya aislado, pero aseguremos
     nodo.sig = primero;
     primero = nodo;
     if (ultimo == null) {
         ultimo = nodo;
     }
     longitud++;
-
-    // registrar en undo
     Movimiento a = new Movimiento(nodo);
     a.sig = desh;
     desh = a;
