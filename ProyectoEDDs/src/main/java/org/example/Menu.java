@@ -8,7 +8,7 @@ public class Menu {
 
     public static void MostrarMenu() {
         System.out.println("----- Menú Principal -----");
-        System.out.println("---Productos---");
+        System.out.println("---Notas---");
         System.out.println("[1] Agregar");
         System.out.println("[2] Eliminar");
         System.out.println("[3] Actualizar");
@@ -40,62 +40,31 @@ public class Menu {
             switch (opcion) {
                 case 1:
                     // Llamada a lista.agregar()
-                    try {
-                        System.out.println("Introduce los datos del producto:");
-                        System.out.print("Clave: ");
-                        int clave = scanner.nextInt();
-                        scanner.nextLine(); 
-                        System.out.print("Descripción: ");
-                        String descripcion = scanner.nextLine();
-                        System.out.print("Precio: ");
-                        double precio = scanner.nextDouble();
-                        System.out.print("Stock: ");
-                        int stock = scanner.nextInt();
-                        scanner.nextLine(); 
+                    System.out.println("Introduce los datos de la nota:");
+                    System.out.print("Título: ");
+                    String titulo = scanner.nextLine();
+                    System.out.print("Contenido: ");
+                    String contenido = scanner.nextLine();
 
-                        lista.agregar(new Nodo(new Nota(clave, descripcion, precio, stock)));
-                        System.out.println("Producto agregado con éxito.");
-                    } catch (InputMismatchException e) {
-                        System.out.println("Error: Ingresaste un tipo de dato incorrecto.");
-                        scanner.nextLine(); 
-                    }
+                    lista.agregar(new Nodo(new Nota(titulo, contenido)));
+                    System.out.println("Nota agregada con éxito.");
                     break;
                 case 2:
-                    try {
-                        System.out.print("Introduce la clave del producto a eliminar: ");
-                        int claveAEliminar = scanner.nextInt();
-                        scanner.nextLine(); 
-                        lista.eliminar(claveAEliminar);
-                    } catch (InputMismatchException e) {
-                        System.out.println("Error: Debes ingresar un número para la clave.");
-                        scanner.nextLine(); 
-                    }
+                    System.out.print("Introduce el título de la nota a eliminar: ");
+                    String tituloEliminar = scanner.nextLine();
+                    lista.eliminar(tituloEliminar);
                     break;
                 case 3:
                     // Llamada a lista.actualizar()
-                        System.out.println("Actualización por posición no es ideal, pero se mantiene la lógica.");
-                    try {
-                        System.out.print("Posición del producto a actualizar (0 es el más reciente): ");
-                        int pos = scanner.nextInt();
-                        scanner.nextLine(); 
+                    System.out.print("Introduce el título de la nota a actualizar: ");
+                    String tituloActualizar = scanner.nextLine();
+                    System.out.print("Introduce el nuevo contenido: ");
+                    String nuevoContenido = scanner.nextLine();
 
-                        System.out.println("Introduce los nuevos datos del producto:");
-                        System.out.print("Nueva Descripción: ");
-                        String nuevaDesc = scanner.nextLine();
-                        System.out.print("Nuevo Precio: ");
-                        double nuevoPrecio = scanner.nextDouble();
-                        System.out.print("Nuevo Stock: ");
-                        int nuevoStock = scanner.nextInt();
-                        scanner.nextLine(); 
-
-                        if (lista.actualizar(pos, new Nota(0, nuevaDesc, nuevoPrecio, nuevoStock))) {
-                            System.out.println("Actualizado con éxito.");
-                        } else {
-                            System.out.println("No se pudo actualizar. Posición inválida.");
-                        }
-                    } catch (InputMismatchException e) {
-                        System.out.println("Error: Ingresaste un tipo de dato incorrecto.");
-                        scanner.nextLine(); 
+                    if (lista.actualizarPorTitulo(tituloActualizar, nuevoContenido)) {
+                        System.out.println("Nota actualizada con éxito.");
+                    } else {
+                        System.out.println("No se encontró una nota con ese título.");
                     }
                     break;
                 case 4:
@@ -116,12 +85,12 @@ public class Menu {
                     break;
                 case 6:
                     // Acceso a lista.desh y lista.reha
-                    System.out.println("Log - Cantidad de productos: " + lista.longitud);
+                    System.out.println("Log - Cantidad de notas: " + lista.longitud);
                     break;
                 case 7:
                     // Imprimir recorriendo lista.primero
                     if (lista.primero == null) {
-                        System.out.println("La lista de productos está vacía.");
+                        System.out.println("La lista de notas está vacía.");
                     } else {
                         Nodo temp = lista.primero;
                         while (temp != null) {

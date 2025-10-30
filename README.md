@@ -51,16 +51,21 @@ java -cp target/classes org.example.Menu
 
 ## 📖 Funcionalidades del Proyecto
 
-El proyecto implementa una lista enlazada con las siguientes funcionalidades:
+El proyecto implementa una lista enlazada de notas con las siguientes funcionalidades:
 
-- **[1] Agregar** - Agrega nuevas notas a la lista
-- **[2] Eliminar** - Usar la opción de Deshacer
-- **[3] Actualizar** - Modifica una nota existente por posición
-- **[4] Deshacer** - Deshace la última operación de agregar
-- **[5] Rehacer** - Rehace una operación deshecha
-- **[6] Log** - Muestra la longitud actual de la lista
-- **[7] Imprimir** - Muestra todas las notas en la lista
+- **[1] Agregar** - Agrega nuevas notas con título y contenido
+- **[2] Eliminar** - Elimina una nota por su título
+- **[3] Actualizar** - Modifica el contenido de una nota existente por su título
+- **[4] Deshacer** - Deshace la última operación (agregar o eliminar)
+- **[5] Rehacer** - Rehace una operación previamente deshecha
+- **[6] Log** - Muestra la cantidad de notas en la lista
+- **[7] Imprimir** - Muestra todas las notas con su título y contenido
 - **[8] Salir** - Cierra el programa
+
+### 📝 Estructura de una Nota
+Cada nota contiene:
+- **Título**: Identificador único de la nota
+- **Contenido**: Texto o descripción de la nota
 
 ## 📁 Estructura del Proyecto
 

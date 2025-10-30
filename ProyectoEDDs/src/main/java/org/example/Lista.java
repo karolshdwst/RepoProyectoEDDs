@@ -21,19 +21,19 @@ public class Lista {
     public class Movimiento {
         TipoMovimiento tipo;
         Nodo nodo;
-        Nodo prev;
+        String tituloPrev; // Título del nodo previo (para eliminación)
         Movimiento sig;
 
         Movimiento(Nodo nodo, TipoMovimiento tipo) {
             this.nodo = nodo;
             this.tipo = tipo;
-            this.prev = null;
+            this.tituloPrev = null;
             this.sig = null;
         }
 
-        Movimiento(Nodo nodo, Nodo prev, TipoMovimiento tipo) {
+        Movimiento(Nodo nodo, String tituloPrev, TipoMovimiento tipo) {
             this.nodo = nodo;
-            this.prev = prev;
+            this.tituloPrev = tituloPrev;
             this.tipo = tipo;
             this.sig = null;
         }
@@ -55,7 +55,7 @@ public class Lista {
         reha = null;
     }
 
-    public boolean eliminar(int clave) {
+    public boolean eliminar(String titulo) {
         if (primero == null) {
             System.out.println("La lista está vacía, no se puede eliminar.");
             return false;
@@ -64,13 +64,13 @@ public class Lista {
         Nodo actual = primero;
         Nodo prev = null;
 
-        while (actual != null && actual.dato.getClave() != clave) {
+        while (actual != null && !actual.dato.getTitulo().equals(titulo)) {
             prev = actual;
             actual = actual.sig;
         }
 
         if (actual == null) {
-            System.out.println("No se encontró un producto con la clave: " + clave);
+            System.out.println("No se encontró una nota con el título: " + titulo);
             return false;
         }
 
@@ -87,12 +87,14 @@ public class Lista {
         longitud--;
         actual.sig = null;
 
-        Movimiento a = new Movimiento(actual, prev, TipoMovimiento.ELIMINAR);
+        // Guardar el título del nodo previo para poder reinsertar correctamente
+        String tituloPrev = (prev != null) ? prev.dato.getTitulo() : null;
+        Movimiento a = new Movimiento(actual, tituloPrev, TipoMovimiento.ELIMINAR);
         a.sig = desh;
         desh = a;
         reha = null;
 
-        System.out.println("Producto con clave " + clave + " eliminado con éxito.");
+        System.out.println("Nota con título '" + titulo + "' eliminada con éxito.");
         return true;
     }
 
@@ -124,6 +126,18 @@ public class Lista {
         return false;
     }
 
+    public boolean actualizarPorTitulo(String titulo, String nuevoContenido) {
+        Nodo temp = primero;
+        while (temp != null) {
+            if (temp.dato.getTitulo().equals(titulo)) {
+                temp.dato = new Nota(titulo, nuevoContenido);
+                return true;
+            }
+            temp = temp.sig;
+        }
+        return false;
+    }
+
     public boolean deshacer() {
         if (desh == null) return false;
 
@@ -131,30 +145,45 @@ public class Lista {
         desh = desh.sig;
 
         if (mov.tipo == TipoMovimiento.AGREGAR) {
+            // Deshacer un agregar = eliminar el nodo
             if (primero == mov.nodo) {
                 primero = primero.sig;
                 if (primero == null) ultimo = null;
             } else {
                 Nodo prev = primero;
-                while (prev.sig != mov.nodo) {
+                while (prev != null && prev.sig != mov.nodo) {
                     prev = prev.sig;
                 }
-                prev.sig = mov.nodo.sig;
-                if (mov.nodo == ultimo) ultimo = prev;
+                if (prev != null) {
+                    prev.sig = mov.nodo.sig;
+                    if (mov.nodo == ultimo) ultimo = prev;
+                }
             }
             longitud--;
             mov.nodo.sig = null;
         } else if (mov.tipo == TipoMovimiento.ELIMINAR) {
+            // Deshacer un eliminar = reinsertar el nodo
             Nodo nodoAReinsertar = mov.nodo;
-            Nodo prev = mov.prev;
-            if (prev == null) {
+            if (mov.tituloPrev == null) {
+                // Se eliminó del inicio, reinsertar al inicio
                 nodoAReinsertar.sig = primero;
                 primero = nodoAReinsertar;
                 if (ultimo == null) ultimo = nodoAReinsertar;
             } else {
-                nodoAReinsertar.sig = prev.sig;
-                prev.sig = nodoAReinsertar;
-                if (nodoAReinsertar.sig == null) ultimo = nodoAReinsertar;
+                // Buscar el nodo con tituloPrev y reinsertar después
+                Nodo prev = primero;
+                while (prev != null && !prev.dato.getTitulo().equals(mov.tituloPrev)) {
+                    prev = prev.sig;
+                }
+                if (prev != null) {
+                    nodoAReinsertar.sig = prev.sig;
+                    prev.sig = nodoAReinsertar;
+                    if (nodoAReinsertar.sig == null) ultimo = nodoAReinsertar;
+                } else {
+                    // Si no se encuentra el prev, insertar al inicio
+                    nodoAReinsertar.sig = primero;
+                    primero = nodoAReinsertar;
+                }
             }
             longitud++;
         }
@@ -171,20 +200,30 @@ public class Lista {
         reha = reha.sig;
 
         if (mov.tipo == TipoMovimiento.AGREGAR) {
+            // Rehacer un agregar = volver a agregar el nodo
             Nodo nodo = mov.nodo;
             nodo.sig = primero;
             primero = nodo;
             if (ultimo == null) ultimo = nodo;
             longitud++;
         } else if (mov.tipo == TipoMovimiento.ELIMINAR) {
+            // Rehacer un eliminar = volver a eliminar el nodo
             Nodo nodoAEliminar = mov.nodo;
-            Nodo prev = mov.prev;
-            if (prev == null) {
+            if (mov.tituloPrev == null) {
+                // Se eliminó del inicio
                 primero = nodoAEliminar.sig;
+                if (primero == null) ultimo = null;
             } else {
-                prev.sig = nodoAEliminar.sig;
+                // Buscar el nodo previo y eliminar
+                Nodo prev = primero;
+                while (prev != null && !prev.dato.getTitulo().equals(mov.tituloPrev)) {
+                    prev = prev.sig;
+                }
+                if (prev != null && prev.sig == nodoAEliminar) {
+                    prev.sig = nodoAEliminar.sig;
+                    if (nodoAEliminar == ultimo) ultimo = prev;
+                }
             }
-            if (nodoAEliminar == ultimo) ultimo = prev;
             longitud--;
             nodoAEliminar.sig = null;
         }
