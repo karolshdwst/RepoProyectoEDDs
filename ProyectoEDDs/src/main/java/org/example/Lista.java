@@ -20,16 +20,20 @@ public class Lista {
     }
 
     public enum TipoMovimiento {
+        AGREGAR, ELIMINAR
+    }
+
+    public enum TipoLog {
         AGREGAR, ELIMINAR, DESHACER, REHACER
     }
 
      public class EntradaLog {
-        private TipoMovimiento tipo;
+        private TipoLog tipo;
         private String tituloNota;
         private String fecha;
         private EntradaLog sig; 
 
-        public EntradaLog(TipoMovimiento tipo, String tituloNota) {
+        public EntradaLog(TipoLog tipo, String tituloNota) {
             this.tipo = tipo;
             this.tituloNota = tituloNota;
             SimpleDateFormat formatter = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
@@ -37,7 +41,7 @@ public class Lista {
             this.sig = null;
         }
 
-        public TipoMovimiento getTipo() { return tipo; }
+        public TipoLog getTipo() { return tipo; }
         public String getTituloNota() { return tituloNota; }
         public String getFecha() { return fecha; }
         public EntradaLog getSig() { return sig; }
@@ -64,7 +68,7 @@ public class Lista {
         }
     }
 
-    public void agregarLog(TipoMovimiento tipo, String tituloNota) {
+    public void agregarLog(TipoLog tipo, String tituloNota) {
         EntradaLog nuevoLog = new EntradaLog(tipo, tituloNota);
         nuevoLog.sig = log;
         log = nuevoLog;
@@ -92,8 +96,11 @@ public class Lista {
         int contador = 1;
         while (actual != null) {
             System.out.println(contador + ". [" + actual.getFecha() + "]");
-            System.out.println("   Tipo: " + (actual.getTipo() == TipoMovimiento.AGREGAR ? "AGREGAR" : "ELIMINAR"));
+            System.out.println("   Tipo: " + (actual.getTipo() == TipoLog.AGREGAR ? "AGREGAR" :
+                                     actual.getTipo() == TipoLog.ELIMINAR ? "ELIMINAR" :
+                                     actual.getTipo() == TipoLog.DESHACER ? "DESHACER" : "REHACER"));
             System.out.println("   Nota: " + actual.getTituloNota());
+            System.out.println("   Referencia de memoria: " + Integer.toHexString(System.identityHashCode(actual)));
             System.out.println("   --------------------");
             actual = actual.sig;
             contador++;
@@ -115,7 +122,7 @@ public class Lista {
         desh = a;
         reha = null;
 
-        agregarLog(TipoMovimiento.AGREGAR, nuevo.dato.getTitulo());
+        agregarLog(TipoLog.AGREGAR, nuevo.dato.getTitulo());
     }
 
     public boolean eliminar(String titulo) {
@@ -157,7 +164,7 @@ public class Lista {
         desh = a;
         reha = null;
 
-        agregarLog(TipoMovimiento.ELIMINAR, titulo);
+        agregarLog(TipoLog.ELIMINAR, titulo);
 
         System.out.println("Nota con título '" + titulo + "' eliminada con éxito.");
         return true;
@@ -226,7 +233,7 @@ public class Lista {
             }
             longitud--;
             mov.nodo.sig = null;
-            agregarLog(TipoMovimiento.DESHACER, mov.nodo.dato.getTitulo());
+            agregarLog(TipoLog.DESHACER, mov.nodo.dato.getTitulo());
 
         } else if (mov.tipo == TipoMovimiento.ELIMINAR) {
             // Deshacer un eliminar = reinsertar el nodo
@@ -253,7 +260,7 @@ public class Lista {
                 }
             }
             longitud++;
-            agregarLog(TipoMovimiento.DESHACER, mov.nodo.dato.getTitulo());
+            agregarLog(TipoLog.DESHACER, mov.nodo.dato.getTitulo());
         }
 
         mov.sig = reha;
@@ -274,7 +281,7 @@ public class Lista {
             primero = nodo;
             if (ultimo == null) ultimo = nodo;
             longitud++;
-            agregarLog(TipoMovimiento.REHACER, mov.nodo.dato.getTitulo());
+            agregarLog(TipoLog.REHACER, mov.nodo.dato.getTitulo());
 
         } else if (mov.tipo == TipoMovimiento.ELIMINAR) {
             // Rehacer un eliminar = volver a eliminar el nodo
@@ -297,7 +304,7 @@ public class Lista {
             longitud--;
             nodoAEliminar.sig = null;
 
-            agregarLog(TipoMovimiento.REHACER, mov.nodo.dato.getTitulo());
+            agregarLog(TipoLog.REHACER, mov.nodo.dato.getTitulo());
         }
 
         mov.sig = desh;
