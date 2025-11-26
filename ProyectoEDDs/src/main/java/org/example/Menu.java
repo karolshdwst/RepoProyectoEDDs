@@ -85,7 +85,7 @@ public class Menu {
                     break;
                 case 6:
                     // Acceso a lista.desh y lista.reha
-                    System.out.println("Log - Cantidad de notas: " + lista.longitud);
+                    lista.imprimirLog();
                     break;
                 case 7:
                     // Imprimir recorriendo lista.primero

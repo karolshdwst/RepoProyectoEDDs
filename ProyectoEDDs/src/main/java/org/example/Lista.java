@@ -1,21 +1,46 @@
 package org.example;
 
+import java.util.Date;
+import java.text.SimpleDateFormat;
+
 public class Lista {
     Nodo primero;
     Nodo ultimo;
     int longitud;
     Movimiento desh;
     Movimiento reha;
+    EntradaLog log;
 
     Lista(){
         primero = ultimo = null;
         longitud = 0;
         desh = null;
         reha = null;
+        log = null;
     }
 
     public enum TipoMovimiento {
-        AGREGAR, ELIMINAR
+        AGREGAR, ELIMINAR, DESHACER, REHACER
+    }
+
+     public class EntradaLog {
+        private TipoMovimiento tipo;
+        private String tituloNota;
+        private String fecha;
+        private EntradaLog sig; 
+
+        public EntradaLog(TipoMovimiento tipo, String tituloNota) {
+            this.tipo = tipo;
+            this.tituloNota = tituloNota;
+            SimpleDateFormat formatter = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
+            this.fecha = formatter.format(new Date());
+            this.sig = null;
+        }
+
+        public TipoMovimiento getTipo() { return tipo; }
+        public String getTituloNota() { return tituloNota; }
+        public String getFecha() { return fecha; }
+        public EntradaLog getSig() { return sig; }
     }
 
     public class Movimiento {
@@ -39,6 +64,42 @@ public class Lista {
         }
     }
 
+    public void agregarLog(TipoMovimiento tipo, String tituloNota) {
+        EntradaLog nuevoLog = new EntradaLog(tipo, tituloNota);
+        nuevoLog.sig = log;
+        log = nuevoLog;
+    }
+
+     public void imprimirLog() {
+        if (log == null) {
+            System.out.println("El log está vacío.");
+            return;
+        }
+
+        System.out.println("=== HISTORIAL DE CAMBIOS ===");
+        
+        EntradaLog pilaAuxiliar = null;
+        EntradaLog actual = log;
+        
+        while (actual != null) {
+            EntradaLog temp = new EntradaLog(actual.getTipo(), actual.getTituloNota());
+            temp.sig = pilaAuxiliar;
+            pilaAuxiliar = temp;
+            actual = actual.sig;
+        }
+        
+        actual = pilaAuxiliar;
+        int contador = 1;
+        while (actual != null) {
+            System.out.println(contador + ". [" + actual.getFecha() + "]");
+            System.out.println("   Tipo: " + (actual.getTipo() == TipoMovimiento.AGREGAR ? "AGREGAR" : "ELIMINAR"));
+            System.out.println("   Nota: " + actual.getTituloNota());
+            System.out.println("   --------------------");
+            actual = actual.sig;
+            contador++;
+        }
+    }
+
     public void agregar(Nodo nuevo) {
         if (nuevo == null) return;
         if (longitud == 0) {
@@ -53,6 +114,8 @@ public class Lista {
         a.sig = desh;
         desh = a;
         reha = null;
+
+        agregarLog(TipoMovimiento.AGREGAR, nuevo.dato.getTitulo());
     }
 
     public boolean eliminar(String titulo) {
@@ -93,6 +156,8 @@ public class Lista {
         a.sig = desh;
         desh = a;
         reha = null;
+
+        agregarLog(TipoMovimiento.ELIMINAR, titulo);
 
         System.out.println("Nota con título '" + titulo + "' eliminada con éxito.");
         return true;
@@ -161,6 +226,8 @@ public class Lista {
             }
             longitud--;
             mov.nodo.sig = null;
+            agregarLog(TipoMovimiento.DESHACER, mov.nodo.dato.getTitulo());
+
         } else if (mov.tipo == TipoMovimiento.ELIMINAR) {
             // Deshacer un eliminar = reinsertar el nodo
             Nodo nodoAReinsertar = mov.nodo;
@@ -186,6 +253,7 @@ public class Lista {
                 }
             }
             longitud++;
+            agregarLog(TipoMovimiento.DESHACER, mov.nodo.dato.getTitulo());
         }
 
         mov.sig = reha;
@@ -206,6 +274,8 @@ public class Lista {
             primero = nodo;
             if (ultimo == null) ultimo = nodo;
             longitud++;
+            agregarLog(TipoMovimiento.REHACER, mov.nodo.dato.getTitulo());
+
         } else if (mov.tipo == TipoMovimiento.ELIMINAR) {
             // Rehacer un eliminar = volver a eliminar el nodo
             Nodo nodoAEliminar = mov.nodo;
@@ -226,6 +296,8 @@ public class Lista {
             }
             longitud--;
             nodoAEliminar.sig = null;
+
+            agregarLog(TipoMovimiento.REHACER, mov.nodo.dato.getTitulo());
         }
 
         mov.sig = desh;
